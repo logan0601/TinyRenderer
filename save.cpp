@@ -2,8 +2,8 @@
  #include <stdlib.h>
  #include <stdio.h>
  #include "vec.h"
+ #include "ray.h"
 
- struct Ray { Vec o, d; Ray(Vec o_, Vec d_) : o(o_), d(d_) {} }; 
  enum Refl_t { DIFF, SPEC, REFR };
  struct Sphere { 
    double rad;

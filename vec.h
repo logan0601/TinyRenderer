@@ -3,6 +3,9 @@
 
 #include <cmath>
 
+#define EPS 1e-4
+#define INF 1e20
+
 class Vec
 {
 public:
@@ -45,6 +48,7 @@ public:
     // Product Op
     static double dot(const Vec& a, const Vec& b);
     static Vec cross(const Vec& a, const Vec& b);
+
 };
 
 #endif // VEC_H
