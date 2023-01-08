@@ -183,7 +183,7 @@ Scene::Scene(int id)
 {
     vector<int> obj_id;
     if(id == 1) {
-        obj_id = { 0, 1, 2, 3, 4, 5, 14, 15, 16, 17, 13 };
+        obj_id = { 0, 1, 2, 3, 4, 5, 14, 15, 16, 17, 6 };
     }
     else {
         obj_id = { 7, 6 };
