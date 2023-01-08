@@ -2,9 +2,12 @@
 #define VEC_H
 
 #include <cmath>
+#include <iostream>
 
-#define EPS 1e-4
 #define INF 1e20
+#define EPS 1e-4
+#define CLP(x) x<0?0:(x>1?1:x)
+#define TOINT(x) int(pow(CLP(x), 1/2.2)*255+.5)
 
 class Vec
 {
@@ -34,21 +37,25 @@ public:
     Vec& operator*=(double s);
     Vec& operator/=(double s);
 
+    // Max Op
+    double max() const;
+
     // Length Op
     double len() const;
     double len2() const;
     Vec& norm();
 
-    // Max op
-    double max() const;
-
     // Index Op
     double operator[](int i) const;
+
+    // Clamp Op
+    Vec& clamp();
 
     // Product Op
     static double dot(const Vec& a, const Vec& b);
     static Vec cross(const Vec& a, const Vec& b);
 
 };
+
 
 #endif // VEC_H
