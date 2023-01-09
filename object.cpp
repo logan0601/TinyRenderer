@@ -180,8 +180,8 @@ Object* objects[] = {
     new Sphere(9,   Vec(50, 9, 70),         new Material(Vec(), Vec(.99, .99, .82), REFR, 1.5)),
 
     // scene 2 18-20
-    new Sphere(16.5,Vec(27,16.5,47),        new Material(Vec(), Vec(.99, .99, .99)*.999, SPEC, 1.5)),
-    new Sphere(9,   Vec(50, 9, 70),         new Material(Vec(), Vec(.99, .99, .82), GLOS, 1.5)),
+    new Sphere(16.5,Vec(27,16.5,47),        new Material(Vec(), Vec(.58, .88, .82), DIFF, 1.5)),
+    new Sphere(9,   Vec(44, 9, 75),         new Material(Vec(), Vec(.99, .99, .82), GLOS, 1.5)),
     new TriangleMesh("./cornellbox/tallbox.obj",  new Material(Vec(), Vec(.75, .75, .75), SPEC, 1.5)),
 
     // scene 3 21-22
@@ -197,7 +197,7 @@ Scene::Scene(int id)
         obj_id = { 0, 1, 2, 3, 4, 5, 14, 15, 16, 17, 6 };
     }
     else if(id == 2) {
-        obj_id = { 0, 1, 2, 3, 4, 5, 18, 19, 13 };
+        obj_id = { 0, 1, 2, 3, 4, 5, 18, 19, 20, 13 };
     }
     else {
         obj_id = { 0, 1, 2, 3, 4, 5, 21, 22, 13};
