@@ -3,7 +3,7 @@
 
 #include "vec.h"
 
-enum Refl_t { DIFF, SPEC, REFR };
+enum Refl_t { DIFF, SPEC, REFR, GLOS };
 
 class Material
 {

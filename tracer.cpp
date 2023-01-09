@@ -30,6 +30,27 @@ Vec PathTracer::radiance(const Ray& r, int dep, unsigned short* X)
     else if(h.m->rt == SPEC) {
         return h.m->e + f * radiance(Ray(x, r.d-h.n*2*Vec::dot(h.n, r.d)), dep, X);
     }
+    else if(h.m->rt == GLOS) {
+        Vec w = nl;
+        Vec u = (Vec::cross((fabs(w.x)>.1 ? Vec(0, 1) : Vec(1)), w)).norm();
+        Vec v = Vec::cross(w, u);
+        Vec rd = r.d - h.n * 2 * Vec::dot(h.n, r.d);
+        if(Vec::dot(rd, u) < EPS) {
+            u = u * -1;
+            v = v * -1;
+        }
+        double r1 = 2 * erand48(X), r2 = 2 * erand48(X);
+        double dx = r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1);
+        double dy = r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
+        double al = acos(Vec::dot(rd, w));
+        double be = acos(Vec::dot(rd - w * al, v));
+        al += dx * 0.2;
+        al = std::max(0.0, al);
+        be += dy * 0.2;
+        be = std::max(0.0, std::min(be, M_PI));
+        rd = (w * cos(al) + u * sin(al) * sin(be) + v * sin(al) * cos(be)).norm();
+        return h.m->e + f * radiance(Ray(x, rd), dep, X);
+    }
     else {
         Ray ref_ray(x, r.d-h.n*2*Vec::dot(h.n, r.d));
         double nnt = h.into?1.0/h.m->nt:h.m->nt;

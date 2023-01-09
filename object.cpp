@@ -146,11 +146,12 @@ Material* materials[] = {
     new Material(Vec(), Vec(),              DIFF, 1.5), // black
     new Material(Vec(), Vec(.75, .75, .75), DIFF, 1.5), // gray
     new Material(Vec(), Vec(.58, .88, .82), DIFF, 1.5), // 
-    new Material(Vec(3, 3, 3), Vec(),    DIFF, 1.5)  // light
+    new Material(Vec(3, 3, 3), Vec(),       DIFF, 1.5), // low light
+    new Material(Vec(15, 15, 15), Vec(),    DIFF, 1.5)  // high light
 };
 
 Object* objects[] = {
-    // sphere walls
+    // sphere walls 0-5
     new Sphere(1e5, Vec( 1e5+1,40.8,81.6),  new Material(Vec(), Vec(.65, .85, .92), DIFF, 1.5)),
     new Sphere(1e5, Vec(-1e5+99,40.8,81.6), new Material(Vec(), Vec(.98, .73, .83), DIFF, 1.5)),
     new Sphere(1e5, Vec(50,40.8, 1e5),      new Material(Vec(), Vec(.75, .75, .75), DIFF, 1.5)),
@@ -158,10 +159,10 @@ Object* objects[] = {
     new Sphere(1e5, Vec(50, 1e5, 81.6),     new Material(Vec(), Vec(.75, .75, .75), DIFF, 1.5)),
     new Sphere(1e5, Vec(50,-1e5+81.6,81.6), new Material(Vec(), Vec(.66, .58, .85), DIFF, 1.5)),
 
-    // sphere light
-    new Sphere(600, Vec(50,681.6-.27,81.6), new Material(Vec(10, 10, 10), Vec(),    DIFF, 1.5)),
+    // sphere light 6
+    new Sphere(6, Vec(50,70.6,81.6),        new Material(Vec(15, 15, 15), Vec(),    DIFF, 1.5)),
 
-    // mesh walls
+    // mesh walls 7-12
     new TriangleMesh("./cornellbox/left.obj",   materials[2]),
     new TriangleMesh("./cornellbox/right.obj",  materials[3]),
     new TriangleMesh("./cornellbox/back.obj",   materials[6]),
@@ -169,14 +170,24 @@ Object* objects[] = {
     new TriangleMesh("./cornellbox/bottom.obj", materials[6]),
     new TriangleMesh("./cornellbox/top.obj",    materials[4]),
 
-    // mesh light
+    // mesh light 13
     new TriangleMesh("./cornellbox/light.obj",  materials[8]),
 
-    // spheres
+    // scene 1 14-17
     new Sphere(16.5,Vec(27,16.5,47),        new Material(Vec(), Vec(.99, .99, .99)*.999, SPEC, 1.5)),
     new Sphere(16.5,Vec(73,16.5,78),        new Material(Vec(), Vec(.99, .99, .99), REFR, 1.5)),
     new Sphere(6,   Vec(38, 6, 90),         new Material(Vec(), Vec(.58, .88, .82), DIFF, 1.5)),
     new Sphere(9,   Vec(50, 9, 70),         new Material(Vec(), Vec(.99, .99, .82), REFR, 1.5)),
+
+    // scene 2 18-20
+    new Sphere(16.5,Vec(27,16.5,47),        new Material(Vec(), Vec(.99, .99, .99)*.999, SPEC, 1.5)),
+    new Sphere(9,   Vec(50, 9, 70),         new Material(Vec(), Vec(.99, .99, .82), GLOS, 1.5)),
+    new TriangleMesh("./cornellbox/tallbox.obj",  new Material(Vec(), Vec(.75, .75, .75), SPEC, 1.5)),
+
+    // scene 3 21-22
+    new TriangleMesh("./cornellbox/shortbox.obj", materials[2]),
+    new TriangleMesh("./cornellbox/tallbox.obj",  new Material(Vec(), Vec(.75, .75, .75), SPEC, 1.5)),
+
 };
 
 Scene::Scene(int id)
@@ -185,9 +196,13 @@ Scene::Scene(int id)
     if(id == 1) {
         obj_id = { 0, 1, 2, 3, 4, 5, 14, 15, 16, 17, 6 };
     }
-    else {
-        obj_id = { 7, 6 };
+    else if(id == 2) {
+        obj_id = { 0, 1, 2, 3, 4, 5, 18, 19, 13 };
     }
+    else {
+        obj_id = { 0, 1, 2, 3, 4, 5, 21, 22, 13};
+    }
+
     num = obj_id.size();
     for(int id : obj_id)
         objs.push_back(objects[id]);
@@ -195,7 +210,8 @@ Scene::Scene(int id)
 
 bool Scene::intersect(const Ray& r, Hit& h)
 {
-    for(Object* obj : objs)
-        obj->intersect(r, h);
+    for(int i = 0; i < num; i++) {
+        objs[i]->intersect(r, h);
+    }
     return h.t < INF;
 }
