@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 
+double erand() { return rand() / double(RAND_MAX); }
+
 Object::Object(Material* m_) { m = m_; }
 
 Sphere::Sphere(double r_, const Vec& p_, Material* m_) : Object(m_)
@@ -27,6 +29,21 @@ bool Sphere::intersect(const Ray& r, Hit& h)
     }
     return false;
 }
+
+pvd Sphere::sample(const Vec& o)
+{
+    Vec po = o - p;
+    Vec w = po.norm();
+    Vec u = (Vec::cross((fabs(w.x)>.1 ? Vec(0, 1) : Vec(1)), w)).norm();
+    Vec v = Vec::cross(w, u);
+    double t = acos(rad / po.len());
+    double r1 = erand() * t, r2 = erand() * 2 * M_PI;
+    double area = 2 * M_PI * rad * rad * (1 - cos(t));
+    Vec x = (w * cos(r1) + u * sin(r1) * cos(r2) + v * sin(r1) * cos(r2)).norm() * rad;
+    return pvd(x, area);
+}
+
+int Sphere::type() { return SPH; }
 
 void Sphere::print()
 {
@@ -75,10 +92,16 @@ bool Triangle::intersect(const Ray& r, Hit& h)
     return false;
 }
 
-void Triangle::print()
+pvd Triangle::sample(const Vec& o)
 {
-    fprintf(stderr, "[TRIANGLE]\n");
+    double a = erand(), b = erand(), c = 1 - a - b;
+    Vec x = v[0] * a + v[1] * b + v[2] * c;
+    double area = Vec::cross(v[1]-v[0], v[2]-v[0]).len();
+    return pvd(x, area);
 }
+
+int Triangle::type() { return TRI; }
+void Triangle::print() { fprintf(stderr, "[TRIANGLE]\n"); }
 
 TriangleMesh::TriangleMesh(const char* path, Material* m_) : Object(m_)
 {
@@ -127,6 +150,23 @@ bool TriangleMesh::intersect(const Ray& r, Hit& h)
     }
     return h.t < INF;
 }
+
+pvd TriangleMesh::sample(const Vec& o)
+{
+    int id = int(erand() * (faces.size() - .1));
+    double area = 0;
+    for(auto f : faces) {
+        const Vec& v0 = vertex[f[0]];
+        const Vec& v1 = vertex[f[1]];
+        const Vec& v2 = vertex[f[2]];
+        area = Vec::cross(v1-v0, v2-v0).len();
+    }
+    double a = erand(), b = erand(), c = 1 - a - b;
+    Vec x = vertex[faces[id][0]] * a + vertex[faces[id][1]] * b + vertex[faces[id][2]] * c;
+    return pvd(x, area);
+}
+
+int TriangleMesh::type() { return MESH; }
 
 void TriangleMesh::print()
 {
@@ -181,8 +221,8 @@ Object* objects[] = {
 
     // scene 2 18-20
     new Sphere(16.5,Vec(27,16.5,47),        new Material(Vec(), Vec(.58, .88, .82), DIFF, 1.5)),
-    new Sphere(9,   Vec(44, 9, 75),         new Material(Vec(), Vec(.99, .99, .82), GLOS, 1.5)),
-    new TriangleMesh("./cornellbox/tallbox.obj",  new Material(Vec(), Vec(.75, .75, .75), SPEC, 1.5)),
+    new Sphere(9,   Vec(40, 9, 75),         new Material(Vec(), Vec(.99, .99, .82), GLOS, 1.5)),
+    new TriangleMesh("./cornellbox/tallbox.obj",  new Material(Vec(), Vec(.75, .75, .75), DIFF, 1.5)),
 
     // scene 3 21-22
     new TriangleMesh("./cornellbox/shortbox.obj", materials[2]),

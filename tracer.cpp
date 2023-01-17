@@ -20,12 +20,20 @@ Vec PathTracer::radiance(const Ray& r, int dep, unsigned short* X)
 
     Vec x = r.point(h.t), nl = h.into ? h.n : h.n * -1.0;
     if(h.m->rt == DIFF) {
+        // pvd pair = scene->objs[scene->num]->sample(x);
+        // Vec rd = (pair.first - x).norm();
+        // Vec L_dir;
+        // Hit lh;
+        // if(scene->intersect(Ray(x, rd), lh)) {
+        //     L_dir = lh.m->e * f * Vec::dot(rd, nl) * Vec::dot(rd, lh.n * -1) / (pair.first - x).len2();
+        // }
+
         double r1 = 2*M_PI*erand48(X), r2 = erand48(X), r2s = sqrt(r2);
         Vec w = nl;
         Vec u = (Vec::cross((fabs(w.x)>.1 ? Vec(0, 1) : Vec(1)), w)).norm();
         Vec v = Vec::cross(w, u);
         Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).norm();
-        return h.m->e + f * radiance(Ray(x, d), dep, X);
+        return L_dir + h.m->e + f * radiance(Ray(x, d), dep, X);
     }
     else if(h.m->rt == SPEC) {
         return h.m->e + f * radiance(Ray(x, r.d-h.n*2*Vec::dot(h.n, r.d)), dep, X);
@@ -43,11 +51,10 @@ Vec PathTracer::radiance(const Ray& r, int dep, unsigned short* X)
         double dx = r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1);
         double dy = r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
         double al = acos(Vec::dot(rd, w));
-        double be = acos(Vec::dot(rd - w * al, v));
-        al += dx * 0.2;
+        double be = acos(Vec::dot(rd - w * cos(al), v));
+        al += dx * 0.05;
         al = std::max(0.0, al);
-        be += dy * 0.2;
-        be = std::max(0.0, std::min(be, M_PI));
+        be += dy * 0.05;
         rd = (w * cos(al) + u * sin(al) * sin(be) + v * sin(al) * cos(be)).norm();
         return h.m->e + f * radiance(Ray(x, rd), dep, X);
     }
