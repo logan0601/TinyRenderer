@@ -1,3 +1,4 @@
 *.ppm
 *.txt
 main
+.DS_Store
